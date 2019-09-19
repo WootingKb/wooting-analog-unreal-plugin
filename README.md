@@ -19,6 +19,16 @@ This repo contains a plugin for Unreal Engine v4.23 which provides Analog Keyboa
 - [ ] Better handling when SDK cannot be initialised
 - [ ] Deal with issue where Digital Keys take priority over Analog, so when Digital keys are enabled on the Wooting keyboard (which is standard) it will seamlessly use the Analog input over the Digital input
 
+## Images
+
+![](https://i.imgur.com/ZHDp1WB.png)
+
+![](https://i.imgur.com/vIsQ5G6.png)
+
+![](https://i.imgur.com/Lkq9moY.png)
+
+![](https://i.imgur.com/sSjJzB8.png)
+
 ## Credits
 
 - Many thanks to Valve for the open source [SteamVR Unreal plugin](https://github.com/ValveSoftware/steamvr_unreal_plugin) which was a really good reference implementation to look at (as Unreal Engine plugin documentation seems to be fairly lacking)
