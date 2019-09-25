@@ -3,7 +3,6 @@
 #include "WootingAnalogInputDevice.h"
 #include "WootingAnalogInputDeviceModulePrivatePCH.h"
 #include "IInputInterface.h"
-#include "wooting-analog-wrapper.h"
 
 #define LOCTEXT_NAMESPACE "WootingAnalogInputDevice"
 DEFINE_LOG_CATEGORY_STATIC(LogWootingAnalogInputDevice, Log, All);
@@ -13,9 +12,7 @@ FWootingAnalogInputDevice::FWootingAnalogInputDevice(const TSharedRef<FGenericAp
 MessageHandler(InMessageHandler)
 {
 	// Initiate your device here
-	WootingAnalogResult result = wooting_analog_initialise();
-	UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("SDK has been init with result %d"), result);
-	wooting_analog_set_keycode_mode(WootingAnalog_KeycodeType::WootingAnalog_KeycodeType_VirtualKeyTranslate);
+	
 	AnalogKeys::InitKeys();
 }
 
@@ -23,7 +20,6 @@ MessageHandler(InMessageHandler)
 FWootingAnalogInputDevice::~FWootingAnalogInputDevice()
 {
 	// Close your device here
-	wooting_analog_uninitialise();
 }
 
 
@@ -54,10 +50,6 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 		}
 	}
 
-	/*if (newval != wkeyval) {
-		UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("W Key has value %f"), newval);
-		wkeyval = newval;
-	}*/
 	for (int i = 0; i < ret; i++) {
 		AnalogVirtualKeys code = (AnalogVirtualKeys)code_buffer[i];
 		float analog = analog_buffer[i];
@@ -65,6 +57,7 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 		auto search = AnalogKeys::KeyMap.find(code);
 		if (search != AnalogKeys::KeyMap.end()) {
 			MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, analog);
+			//Remove this key from the active keys, as it has been updated
 			active_keys.erase(code);
 		}
 		else {
@@ -72,6 +65,8 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 		}
 	}
 
+	//Go through the active keys set and set all to zero, as any remainder ones that haven't been erased before means that they were added last frame due to being pressed but are no longer being pressed
+	//As the SDK currently only reports the keys when they are pressed, not when let go
 	for (std::hash_set<AnalogVirtualKeys>::iterator pIter = active_keys.begin(); pIter != active_keys.end(); pIter++) {
 		auto search = AnalogKeys::KeyMap.find(*pIter);
 		if (search != AnalogKeys::KeyMap.end()) {
@@ -80,6 +75,7 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 	}
 	active_keys.clear();
 
+	//Add all the pressed keys from this read to the active keys set
 	for (int i = 0; i < ret; i++) {
 		AnalogVirtualKeys code = (AnalogVirtualKeys)code_buffer[i];
 		active_keys.insert(code);

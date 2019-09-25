@@ -4,6 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 #include "IInputDeviceModule.h"
+#include "wooting-analog-wrapper.h"
 
 
 /**
@@ -33,6 +34,6 @@ public:
 	 */
 	static inline bool IsAvailable()
 	{
-		return FModuleManager::Get().IsModuleLoaded("WootingAnalogInputDeviceModule");
+		return FModuleManager::Get().IsModuleLoaded("WootingAnalogInputDeviceModule") && wooting_analog_is_initialised();
 	}
 };

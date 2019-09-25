@@ -4,6 +4,7 @@
 
 #pragma comment(lib, "userenv.lib")
 #pragma comment(lib, "ws2_32.lib")
+#pragma once
 
 #include <cstdarg>
 #include <cstdint>

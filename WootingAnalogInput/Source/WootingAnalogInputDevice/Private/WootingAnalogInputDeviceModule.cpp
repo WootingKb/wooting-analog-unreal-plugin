@@ -36,6 +36,11 @@ void FWootingAnalogInputDeviceModule::StartupModule()
 
 	UE_LOG(LogTemp, Warning, TEXT("WootingAnalogInputDevicePlugin initiated!"));
 
+	WootingAnalogResult result = wooting_analog_initialise();
+	UE_LOG(LogTemp, Warning, TEXT("SDK has been init with result %d"), result);
+	wooting_analog_set_keycode_mode(WootingAnalog_KeycodeType::WootingAnalog_KeycodeType_VirtualKeyTranslate);
+
+
 	// IMPORTANT: This line registers our input device module with the engine.
 	//	      If we do not register the input device module with the engine,
 	//	      the engine won't know about our existence. Which means 
@@ -51,6 +56,7 @@ void FWootingAnalogInputDeviceModule::ShutdownModule()
 	// we call this function before unloading the module.
 
 	UE_LOG(LogTemp, Warning, TEXT("WootingAnalogInputDevicePlugin shut down!"));
+	wooting_analog_uninitialise();
 
 	// Unregister our input device module
 	IModularFeatures::Get().UnregisterModularFeature(IInputDeviceModule::GetModularFeatureName(), this);
