@@ -22,7 +22,7 @@ class FWootingAnalogInputDeviceModule : public IWootingAnalogInputDeviceModule
 
 TSharedPtr<class IInputDevice> FWootingAnalogInputDeviceModule::CreateInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Created new input device!"));
+	UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("Created new input device!"));
 
 	// See GenericInputDevice.h for the definition of the IInputDevice we are returning here
 	return MakeShareable(new FWootingAnalogInputDevice(InMessageHandler));
@@ -34,10 +34,27 @@ void FWootingAnalogInputDeviceModule::StartupModule()
 	// This code will execute after your module is loaded into memory (but after global variables are initialized, of course.)
 	// Custom module-specific init can go here.
 
-	UE_LOG(LogTemp, Warning, TEXT("WootingAnalogInputDevicePlugin initiated!"));
+	UE_LOG(LogWootingAnalogInputDevice, Display, TEXT("WootingAnalogInputDevicePlugin initiated!"));
 
 	WootingAnalogResult result = wooting_analog_initialise();
-	UE_LOG(LogTemp, Warning, TEXT("SDK has been init with result %d"), result);
+	switch (result) {
+		case WootingAnalogResult::WootingAnalogResult_FunctionNotFound:
+			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK is either not installed or could not be found!"));
+			break;
+		case WootingAnalogResult::WootingAnalogResult_NoDevices:
+			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("Wooting Analog SDK has been initialised successfully, but no devices appear to be connected"));
+			break;
+		case WootingAnalogResult::WootingAnalogResult_NoPlugins:
+			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK was found, but it couldn't find any Analog Device plugins!"));
+			break;
+		case WootingAnalogResult::WootingAnalogResult_Ok:
+			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK was successfully initialised and devices are connected!"));
+			break;
+		default:
+			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("SDK has been init with result %d"), result);
+			break;
+	}
+
 	wooting_analog_set_keycode_mode(WootingAnalog_KeycodeType::WootingAnalog_KeycodeType_VirtualKeyTranslate);
 
 
@@ -55,10 +72,10 @@ void FWootingAnalogInputDeviceModule::ShutdownModule()
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
 
-	UE_LOG(LogTemp, Warning, TEXT("WootingAnalogInputDevicePlugin shut down!"));
+	UE_LOG(LogWootingAnalogInputDevice, Display, TEXT("WootingAnalogInputDevicePlugin shut down!"));
 	wooting_analog_uninitialise();
 
-	// Unregister our input device module
+	// Unregister our input device moduleDisplay
 	IModularFeatures::Get().UnregisterModularFeature(IInputDeviceModule::GetModularFeatureName(), this);
 }
 

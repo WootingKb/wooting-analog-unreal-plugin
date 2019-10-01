@@ -5,6 +5,7 @@
 #include "IInputDevice.h"
 #include "WootingAnalogInputKeys.h"
 #include <hash_set>
+#include "WootingAnalogInputDeviceModulePrivatePCH.h"
 
 #define ANALOG_BUFFER_LEN 40
 
@@ -35,5 +36,6 @@ private:
 	TSharedRef<FGenericApplicationMessageHandler> MessageHandler;
 	unsigned short code_buffer[ANALOG_BUFFER_LEN];
 	float analog_buffer[ANALOG_BUFFER_LEN];
+	WootingAnalogResult last_read_buffer_result;
 	std::hash_set<AnalogVirtualKeys> active_keys = {};
 };

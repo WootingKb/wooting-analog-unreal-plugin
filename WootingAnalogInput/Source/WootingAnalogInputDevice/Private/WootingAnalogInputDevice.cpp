@@ -1,11 +1,10 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
 #include "WootingAnalogInputDevice.h"
-#include "WootingAnalogInputDeviceModulePrivatePCH.h"
 #include "IInputInterface.h"
 
 #define LOCTEXT_NAMESPACE "WootingAnalogInputDevice"
-DEFINE_LOG_CATEGORY_STATIC(LogWootingAnalogInputDevice, Log, All);
+
 
 
 FWootingAnalogInputDevice::FWootingAnalogInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler) :
@@ -40,13 +39,20 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 	int ret = wooting_analog_read_full_buffer(code_buffer, analog_buffer, ANALOG_BUFFER_LEN);
 	if (ret < 0) {
 		WootingAnalogResult result = (WootingAnalogResult)ret;
-		switch (result) {
-			case WootingAnalogResult::WootingAnalogResult_NoDevices:
-				UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Error: No Analog devices connected"));
-				break;
-			default:
-				UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Error while reading full buffer %d"), ret);
-				return;
+		//We want to report the error to the log, but only if it's different than the last result, so we dob't spam the log
+		if (result != last_read_buffer_result) {
+			last_read_buffer_result = result;
+			switch (result) {
+				case WootingAnalogResult::WootingAnalogResult_NoDevices:
+					UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("No Analog devices connected"));
+					return;
+				case WootingAnalogResult::WootingAnalogResult_UnInitialized:
+					UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK hasn't been initialised"));
+					return;
+				default:
+					UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Unhandled Error while reading full buffer %d"), ret);
+					return;
+			}
 		}
 	}
 
