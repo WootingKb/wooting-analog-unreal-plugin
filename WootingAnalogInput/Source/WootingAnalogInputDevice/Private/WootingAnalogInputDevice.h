@@ -5,9 +5,12 @@
 #include "IInputDevice.h"
 #include "WootingAnalogInputKeys.h"
 #include <hash_set>
+#include "WootingAnalogInputFunctionLibrary.h"
 #include "WootingAnalogInputDeviceModulePrivatePCH.h"
 
 #define ANALOG_BUFFER_LEN 40
+
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDeviceConnectionChanged, FWootingAnalogInputDeviceInfo, Device);
 
 class FWootingAnalogInputDevice : public IInputDevice
 {
@@ -34,6 +37,8 @@ public:
 private:
 	/* Message handler */
 	TSharedRef<FGenericApplicationMessageHandler> MessageHandler;
+	//TSharedRef<FGenericApplicationMessageHandler> DefaultHandler;
+	TSharedRef<FKeyInterceptMessageHandler> InterceptHandler;
 	unsigned short code_buffer[ANALOG_BUFFER_LEN];
 	float analog_buffer[ANALOG_BUFFER_LEN];
 	WootingAnalogResult last_read_buffer_result;

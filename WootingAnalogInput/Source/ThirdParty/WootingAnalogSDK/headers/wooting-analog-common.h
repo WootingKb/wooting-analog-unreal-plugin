@@ -8,45 +8,50 @@
 #include <cstdint>
 #include <cstdlib>
 #include <new>
+#include "CoreMinimal.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 
-enum class WootingAnalog_DeviceEventType {
+UENUM(BlueprintType)
+enum class WootingAnalog_DeviceEventType : uint8 {
   /// Device has been connected
-  WootingAnalog_DeviceEventType_Connected = 1,
+  Connected = 1 UMETA(DisplayName = "Connected"),
   /// Device has been disconnected
-  WootingAnalog_DeviceEventType_Disconnected,
+  Disconnected UMETA(DisplayName = "Disconnected")
 };
 
+UENUM(BlueprintType)
 enum class WootingAnalog_KeycodeType {
   /// USB HID Keycodes https://www.usb.org/document-library/hid-usage-tables-112 pg53
-  WootingAnalog_KeycodeType_HID,
+  HID UMETA(DisplayName = "HID"),
   /// Scan code set 1
-  WootingAnalog_KeycodeType_ScanCode1,
+  ScanCode1 UMETA(DisplayName = "ScanCode Set 1"),
   /// Windows Virtual Keys
-  WootingAnalog_KeycodeType_VirtualKey,
+  VirtualKey UMETA(DisplayName = "Windows Virtual Keys"),
   /// Windows Virtual Keys which are translated to the current keyboard locale
-  WootingAnalog_KeycodeType_VirtualKeyTranslate,
+  VirtualKeyTranslate UMETA(DisplayName = "Windows Virtual Keys (with locale conversion)"),
 };
 
+
 enum class WootingAnalogResult {
-  WootingAnalogResult_Ok = 1,
-  /// Item hasn't been initialized
-  WootingAnalogResult_UnInitialized = -2000,
-  /// No Devices are connected
-  WootingAnalogResult_NoDevices,
-  /// Device has been disconnected
-  WootingAnalogResult_DeviceDisconnected,
-  /// Generic Failure
-  WootingAnalogResult_Failure,
-  /// A given parameter was invalid
-  WootingAnalogResult_InvalidArgument,
-  /// No Plugins were found
-  WootingAnalogResult_NoPlugins,
-  /// The specified function was not found in the library
-  WootingAnalogResult_FunctionNotFound,
-  /// No Keycode mapping to HID was found for the given Keycode
-  WootingAnalogResult_NoMapping,
-  /// Indicates that it isn't available on this platform
-  WootingAnalogResult_NotAvailable,
+	Ok = 1 UMETA(DisplayName = "Ok"),
+	/// Item hasn't been initialized
+	UnInitialized = -2000 UMETA(DisplayName = "UnInitialized"),
+	/// No Devices are connected
+	NoDevices UMETA(DisplayName = "No Devices"),
+	/// Device has been disconnected
+	DeviceDisconnected UMETA(DisplayName = "Device Disconnected"),
+	/// Generic Failure
+	Failure UMETA(DisplayName = "Failure"),
+	/// A given parameter was invalid
+	InvalidArgument UMETA(DisplayName = "Invalid Argument"),
+	/// No Plugins were found
+	NoPlugins UMETA(DisplayName = "No Plugins"),
+	/// The specified function was not found in the library
+	FunctionNotFound UMETA(DisplayName = "Function Not Found"),
+	/// No Keycode mapping to HID was found for the given Keycode
+	NoMapping UMETA(DisplayName = "No Mapping"),
+	/// Indicates that it isn't available on this platform
+	NotAvailable UMETA(DisplayName = "Not Available"),
 };
 
 using WootingAnalog_DeviceID = uint64_t;

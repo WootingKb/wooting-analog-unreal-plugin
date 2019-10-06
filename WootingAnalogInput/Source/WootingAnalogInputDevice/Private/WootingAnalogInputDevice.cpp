@@ -2,19 +2,39 @@
 
 #include "WootingAnalogInputDevice.h"
 #include "IInputInterface.h"
+#include "Framework/Application/SlateApplication.h"
+#include "KeyInterceptMessageHandler.h"
 
 #define LOCTEXT_NAMESPACE "WootingAnalogInputDevice"
 
+void DeviceEvent(WootingAnalog_DeviceEventType eventType, WootingAnalog_DeviceInfo* deviceInfo) {
+	UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("Received Device event"));
+	UWootingAnalogInputFunctionLibrary::GetSDK()->OnDeviceEvent.Broadcast((WootingAnalog_DeviceEventTypeBlueprint)eventType, FWootingAnalogInputDeviceInfo(deviceInfo));
 
+
+	if (eventType == WootingAnalog_DeviceEventType::Connected) {
+		UWootingAnalogInputFunctionLibrary::GetSDK()->OnDeviceConnected.Broadcast(FWootingAnalogInputDeviceInfo(deviceInfo));
+	}
+	else {
+		UWootingAnalogInputFunctionLibrary::GetSDK()->OnDeviceDisconnected.Broadcast(FWootingAnalogInputDeviceInfo(deviceInfo));
+	}
+}
 
 FWootingAnalogInputDevice::FWootingAnalogInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler) :
-MessageHandler(InMessageHandler)
+MessageHandler(InMessageHandler), InterceptHandler(MakeShareable(new FKeyInterceptMessageHandler(InMessageHandler)))
 {
 	// Initiate your device here
 	
 	AnalogKeys::InitKeys();
-}
 
+	wooting_analog_set_device_event_cb(DeviceEvent);
+
+	UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Set the Key Intercept handler"));
+	//TSharedRef<FGenericApplicationMessageHandler> DefaultHandler = FSlateApplication::Get().GetPlatformApplication()->GetMessageHandler();
+
+
+	FSlateApplication::Get().GetPlatformApplication()->SetMessageHandler(InterceptHandler);
+}
 
 FWootingAnalogInputDevice::~FWootingAnalogInputDevice()
 {
@@ -43,10 +63,10 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 		if (result != last_read_buffer_result) {
 			last_read_buffer_result = result;
 			switch (result) {
-				case WootingAnalogResult::WootingAnalogResult_NoDevices:
+				case WootingAnalogResult::NoDevices:
 					UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("No Analog devices connected"));
 					return;
-				case WootingAnalogResult::WootingAnalogResult_UnInitialized:
+				case WootingAnalogResult::UnInitialized:
 					UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK hasn't been initialised"));
 					return;
 				default:
@@ -56,12 +76,16 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 		}
 	}
 
+
 	for (int i = 0; i < ret; i++) {
 		AnalogVirtualKeys code = (AnalogVirtualKeys)code_buffer[i];
 		float analog = analog_buffer[i];
 
 		auto search = AnalogKeys::KeyMap.find(code);
 		if (search != AnalogKeys::KeyMap.end()) {
+#ifdef WITH_EDITOR
+			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key has value %f"), code, analog);
+#endif
 			MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, analog);
 			//Remove this key from the active keys, as it has been updated
 			active_keys.erase(code);
@@ -76,6 +100,9 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 	for (std::hash_set<AnalogVirtualKeys>::iterator pIter = active_keys.begin(); pIter != active_keys.end(); pIter++) {
 		auto search = AnalogKeys::KeyMap.find(*pIter);
 		if (search != AnalogKeys::KeyMap.end()) {
+#ifdef WITH_EDITOR
+			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key has value %f"), search->first, 0.0f);
+#endif
 			MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, 0.0f);
 		}
 	}
@@ -85,6 +112,22 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 	for (int i = 0; i < ret; i++) {
 		AnalogVirtualKeys code = (AnalogVirtualKeys)code_buffer[i];
 		active_keys.insert(code);
+	}
+
+	for (std::hash_set<int32>::iterator pIter = InterceptHandler->PressedKeys.begin(); pIter != InterceptHandler->PressedKeys.end(); pIter++) {
+		AnalogVirtualKeys vk = (AnalogVirtualKeys)*pIter;
+
+		//Check if the pressed key is in the active keys list, if not then we want to set it as 1
+		if (active_keys.find(vk) == active_keys.end()) {
+			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key is pressed but has no analog! Searching for mapping"), *pIter);
+
+			auto search = AnalogKeys::KeyMap.find(vk);
+			if (search != AnalogKeys::KeyMap.end()) {
+				UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key mapping found! Setting it to 1.0f"), *pIter);
+				MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, 1.0f);
+				active_keys.insert(vk);
+			}
+		}
 	}
 }
 

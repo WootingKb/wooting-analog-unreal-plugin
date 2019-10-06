@@ -38,24 +38,24 @@ void FWootingAnalogInputDeviceModule::StartupModule()
 
 	WootingAnalogResult result = wooting_analog_initialise();
 	switch (result) {
-		case WootingAnalogResult::WootingAnalogResult_FunctionNotFound:
+		case WootingAnalogResult::FunctionNotFound:
 			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK is either not installed or could not be found!"));
 			break;
-		case WootingAnalogResult::WootingAnalogResult_NoDevices:
+		case WootingAnalogResult::NoDevices:
 			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("Wooting Analog SDK has been initialised successfully, but no devices appear to be connected"));
 			break;
-		case WootingAnalogResult::WootingAnalogResult_NoPlugins:
+		case WootingAnalogResult::NoPlugins:
 			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK was found, but it couldn't find any Analog Device plugins!"));
 			break;
-		case WootingAnalogResult::WootingAnalogResult_Ok:
-			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK was successfully initialised and devices are connected!"));
+		case WootingAnalogResult::Ok:
+			UE_LOG(LogWootingAnalogInputDevice, Display, TEXT("Wooting Analog SDK was successfully initialised and devices are connected!"));
 			break;
 		default:
 			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("SDK has been init with result %d"), result);
 			break;
 	}
 
-	wooting_analog_set_keycode_mode(WootingAnalog_KeycodeType::WootingAnalog_KeycodeType_VirtualKeyTranslate);
+	wooting_analog_set_keycode_mode(WootingAnalog_KeycodeType::VirtualKeyTranslate);
 
 
 	// IMPORTANT: This line registers our input device module with the engine.

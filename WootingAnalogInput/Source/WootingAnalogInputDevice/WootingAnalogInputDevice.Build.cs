@@ -15,6 +15,11 @@ public class WootingAnalogInputDevice : ModuleRules
             "WootingAnalogInput"
         });
 
+        PrivateDependencyModuleNames.AddRange(new string[] {
+            "Core",
+            "CoreUObject"
+        });
+
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
@@ -26,6 +31,7 @@ public class WootingAnalogInputDevice : ModuleRules
                 "Slate",
                 "InputCore",
                 "InputDevice",
+                "SlateCore",
             }
             );
     }
