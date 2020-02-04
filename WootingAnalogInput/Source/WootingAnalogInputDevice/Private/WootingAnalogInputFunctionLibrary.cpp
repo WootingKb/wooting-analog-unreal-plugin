@@ -33,7 +33,7 @@ UWootingAnalogInputSDK* UWootingAnalogInputFunctionLibrary::GetSDK() {
 #define ANALOG_DEVICEBUFFERLEN 10
 TArray<FWootingAnalogInputDeviceInfo> UWootingAnalogInputFunctionLibrary::GetConnectedDevices(WootingAnalogResultBlueprint& result) {
 	TArray<FWootingAnalogInputDeviceInfo> Devices;
-	WootingAnalog_DeviceInfo* deviceInfos[ANALOG_DEVICEBUFFERLEN];
+	WootingAnalog_DeviceInfo_FFI* deviceInfos[ANALOG_DEVICEBUFFERLEN];
 
 
 	int res = wooting_analog_get_connected_devices_info(deviceInfos, ANALOG_DEVICEBUFFERLEN);

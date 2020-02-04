@@ -42,5 +42,5 @@ private:
 	unsigned short code_buffer[ANALOG_BUFFER_LEN];
 	float analog_buffer[ANALOG_BUFFER_LEN];
 	WootingAnalogResult last_read_buffer_result;
-	std::hash_set<AnalogVirtualKeys> active_keys = {};
+	//std::hash_set<AnalogVirtualKeys> active_keys = {};
 };

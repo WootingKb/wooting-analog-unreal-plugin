@@ -7,7 +7,7 @@
 
 #define LOCTEXT_NAMESPACE "WootingAnalogInputDevice"
 
-void DeviceEvent(WootingAnalog_DeviceEventType eventType, WootingAnalog_DeviceInfo* deviceInfo) {
+void DeviceEvent(WootingAnalog_DeviceEventType eventType, WootingAnalog_DeviceInfo_FFI* deviceInfo) {
 	UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("Received Device event"));
 	UWootingAnalogInputFunctionLibrary::GetSDK()->OnDeviceEvent.Broadcast((WootingAnalog_DeviceEventTypeBlueprint)eventType, FWootingAnalogInputDeviceInfo(deviceInfo));
 
@@ -87,27 +87,13 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key has value %f"), code, analog);
 #endif
 			MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, analog);
-			//Remove this key from the active keys, as it has been updated
-			active_keys.erase(code);
 		}
 		else {
 			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("Couldn't map the (%d) key from the Analog Buffer"), code);
 		}
 	}
 
-	//Go through the active keys set and set all to zero, as any remainder ones that haven't been erased before means that they were added last frame due to being pressed but are no longer being pressed
-	//As the SDK currently only reports the keys when they are pressed, not when let go
-	for (std::hash_set<AnalogVirtualKeys>::iterator pIter = active_keys.begin(); pIter != active_keys.end(); pIter++) {
-		auto search = AnalogKeys::KeyMap.find(*pIter);
-		if (search != AnalogKeys::KeyMap.end()) {
-#ifdef WITH_EDITOR
-			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key has value %f"), search->first, 0.0f);
-#endif
-			MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, 0.0f);
-		}
-	}
-	active_keys.clear();
-
+	std::hash_set<AnalogVirtualKeys> active_keys = {};
 	//Add all the pressed keys from this read to the active keys set
 	for (int i = 0; i < ret; i++) {
 		AnalogVirtualKeys code = (AnalogVirtualKeys)code_buffer[i];
@@ -125,10 +111,26 @@ void FWootingAnalogInputDevice::SendControllerEvents()
 			if (search != AnalogKeys::KeyMap.end()) {
 				UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key mapping found! Setting it to 1.0f"), *pIter);
 				MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, 1.0f);
-				active_keys.insert(vk);
 			}
 		}
 	}
+
+	for (std::hash_set<int32>::iterator pIter = InterceptHandler->ReleasedKeys.begin(); pIter != InterceptHandler->ReleasedKeys.end(); pIter++) {
+		AnalogVirtualKeys vk = (AnalogVirtualKeys)*pIter;
+
+		//Check if the pressed key is in the active keys list, if not then we want to set it as 1
+		if (active_keys.find(vk) == active_keys.end()) {
+			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key was released but has no analog! Searching for mapping"), *pIter);
+
+			auto search = AnalogKeys::KeyMap.find(vk);
+			if (search != AnalogKeys::KeyMap.end()) {
+				UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("%d Key mapping found! Setting it to 0.0f"), *pIter);
+				MessageHandler->OnControllerAnalog(search->second.GetFName(), 0, 0.0f);
+			}
+		}
+	}
+
+	InterceptHandler->ReleasedKeys.clear();
 }
 
 

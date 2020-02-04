@@ -62,7 +62,7 @@ struct FWootingAnalogInputDeviceInfo
 	{
 	}
 
-	FWootingAnalogInputDeviceInfo(WootingAnalog_DeviceInfo* device_info)
+	FWootingAnalogInputDeviceInfo(WootingAnalog_DeviceInfo_FFI* device_info)
 	{
 		VendorID = device_info->vendor_id;
 		ProductID = device_info->product_id;

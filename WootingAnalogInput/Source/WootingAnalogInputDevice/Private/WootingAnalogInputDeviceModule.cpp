@@ -36,23 +36,26 @@ void FWootingAnalogInputDeviceModule::StartupModule()
 
 	UE_LOG(LogWootingAnalogInputDevice, Display, TEXT("WootingAnalogInputDevicePlugin initiated!"));
 
-	WootingAnalogResult result = wooting_analog_initialise();
-	switch (result) {
+	int result = wooting_analog_initialise();
+	if (result >= 0) {
+		UE_LOG(LogWootingAnalogInputDevice, Display, TEXT("Wooting Analog SDK was successfully initialised and '%d' devices are connected!"), result);
+
+	}
+	else {
+		switch ((WootingAnalogResult)result) {
+		case WootingAnalogResult::IncompatibleVersion:
+			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK is running an Incompatible Version!"));
+			break;
 		case WootingAnalogResult::FunctionNotFound:
 			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK is either not installed or could not be found!"));
-			break;
-		case WootingAnalogResult::NoDevices:
-			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("Wooting Analog SDK has been initialised successfully, but no devices appear to be connected"));
 			break;
 		case WootingAnalogResult::NoPlugins:
 			UE_LOG(LogWootingAnalogInputDevice, Error, TEXT("Wooting Analog SDK was found, but it couldn't find any Analog Device plugins!"));
 			break;
-		case WootingAnalogResult::Ok:
-			UE_LOG(LogWootingAnalogInputDevice, Display, TEXT("Wooting Analog SDK was successfully initialised and devices are connected!"));
-			break;
 		default:
 			UE_LOG(LogWootingAnalogInputDevice, Warning, TEXT("SDK has been init with result %d"), result);
 			break;
+		}
 	}
 
 	wooting_analog_set_keycode_mode(WootingAnalog_KeycodeType::VirtualKeyTranslate);

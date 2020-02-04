@@ -62,6 +62,7 @@ bool FKeyInterceptMessageHandler::OnKeyDown(const int32 KeyCode, const uint32 Ch
 bool FKeyInterceptMessageHandler::OnKeyUp(const int32 KeyCode, const uint32 CharacterCode, const bool IsRepeat)
 {
 	PressedKeys.erase(KeyCode);
+	ReleasedKeys.insert(KeyCode);
 	if (TargetHandler.IsValid())
 	{
 		return TargetHandler->OnKeyUp(KeyCode, CharacterCode, IsRepeat);

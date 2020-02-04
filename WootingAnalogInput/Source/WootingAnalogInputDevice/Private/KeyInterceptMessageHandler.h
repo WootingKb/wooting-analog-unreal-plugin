@@ -12,6 +12,7 @@ class FKeyInterceptMessageHandler : public FGenericApplicationMessageHandler, pu
 	
 public:
 	std::hash_set<int32> PressedKeys = {};
+	std::hash_set<int32> ReleasedKeys = {};
 
 
 	FKeyInterceptMessageHandler();
