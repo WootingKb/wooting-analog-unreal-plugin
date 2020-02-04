@@ -1,6 +1,8 @@
 # Wooting Analog Unreal Plugin
 
-This repo contains a plugin for Unreal Engine v4.23 which provides Analog Keyboard input, using the [Wooting Analog SDK](https://github.com/WootingKb/wooting-analog-sdk)
+This repo contains a plugin for Unreal Engine v4.23 which provides Analog Keyboard input, using the [Wooting Analog SDK](https://github.com/WootingKb/wooting-analog-sdk).
+
+Currently this is an initial version which is not necessarily feature complete. Any feedback would be greatly appreciated, as we are not game developers so a lot of this was tested with Unreal's sample games.
 
 ## Plugin Usage
 
@@ -13,11 +15,13 @@ This repo contains a plugin for Unreal Engine v4.23 which provides Analog Keyboa
 ## Notes
 
 - For the plugin to work, the [Wooting Analog SDK](https://github.com/WootingKb/wooting-analog-sdk) must be installed, refer to [this page](https://github.com/WootingKb/wooting-analog-sdk) for installation instructions
+- This Plugin provides Analog versions of every keyboard key under "Analog Keyboard". This can be used as a full replacement for any bindings to regular keyboard keys. In the case where no analog keyboard is connected or being used, regular key presses will be passed through with values 1.0f when pressed and 0.0f when released. Analog keys will take priority over regular key presses, so if you were to press the key W on an analog keyboard as well as regular keyboard at the same time, the value of the analog press will be used.
 
 ## TODO
 
 - [ ] Better handling when SDK cannot be initialised
-- [ ] Deal with issue where Digital Keys take priority over Analog, so when Digital keys are enabled on the Wooting keyboard (which is standard) it will seamlessly use the Analog input over the Digital input
+- [ ] Multiple analog device support. Currently all analog input is sent under the same input device.
+- [ ] Support Linux & Mac builds
 
 ## Images
 
@@ -28,6 +32,8 @@ This repo contains a plugin for Unreal Engine v4.23 which provides Analog Keyboa
 ![](https://i.imgur.com/Lkq9moY.png)
 
 ![](https://i.imgur.com/sSjJzB8.png)
+
+![](https://i.imgur.com/B59mDMW.png)
 
 ## Credits
 
