@@ -14,7 +14,7 @@ Currently this is an initial version which is not necessarily feature complete. 
 
 ## Notes
 
-- For the plugin to work, the [Wooting Analog SDK](https://github.com/WootingKb/wooting-analog-sdk) must be installed, refer to [this page](https://github.com/WootingKb/wooting-analog-sdk) for installation instructions
+- For the analog reading to work, the [Wooting Analog SDK](https://github.com/WootingKb/wooting-analog-sdk) must be installed, refer to [this page](https://github.com/WootingKb/wooting-analog-sdk) for installation instructions. If the Analog SDK cannot be initialised, regular key presses will still be passed through the Analog * key inputs
 - This Plugin provides Analog versions of every keyboard key under "Analog Keyboard". This can be used as a full replacement for any bindings to regular keyboard keys. In the case where no analog keyboard is connected or being used, regular key presses will be passed through with values 1.0f when pressed and 0.0f when released. Analog keys will take priority over regular key presses, so if you were to press the key W on an analog keyboard as well as regular keyboard at the same time, the value of the analog press will be used.
 
 ## TODO
