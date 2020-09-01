@@ -1,6 +1,6 @@
 # Wooting Analog Unreal Plugin
 
-This repo contains a plugin for Unreal Engine v4.23 which provides Analog Keyboard input, using the [Wooting Analog SDK](https://github.com/WootingKb/wooting-analog-sdk).
+This repo contains a plugin for Unreal Engine v4.23-25 which provides Analog Keyboard input, using the [Wooting Analog SDK](https://github.com/WootingKb/wooting-analog-sdk).
 
 Currently this is an initial version which is not necessarily feature complete. Any feedback would be greatly appreciated, as we are not game developers so a lot of this was tested with Unreal's sample games.
 

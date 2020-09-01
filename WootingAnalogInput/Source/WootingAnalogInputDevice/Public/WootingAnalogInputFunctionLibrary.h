@@ -10,6 +10,8 @@
 UENUM(BlueprintType)
 enum class WootingAnalogResultBlueprint : uint8 {
 	Ok = 1 UMETA(DisplayName = "Ok"),
+
+	None = 0 UMETA(DisplayName = "None"),
 	/// Item hasn't been initialized
 	UnInitialized = 48 UMETA(DisplayName = "UnInitialized"), //48 is -2000 when cast as uint8
 	/// No Devices are connected
@@ -34,6 +36,8 @@ UENUM(BlueprintType)
 enum class WootingAnalog_DeviceEventTypeBlueprint : uint8 {
 	/// Device has been connected
 	Connected = 1 UMETA(DisplayName = "Connected"),
+
+	None = 0 UMETA(DisplayName = "Null"),
 	/// Device has been disconnected
 	Disconnected UMETA(DisplayName = "Disconnected")
 };
