@@ -33,6 +33,8 @@ public:
 
 	virtual bool OnKeyUp(const int32 KeyCode, const uint32 CharacterCode, const bool IsRepeat) override;
 
+	virtual void OnInputLanguageChanged() override;
+
 	virtual bool OnMouseDown(const TSharedPtr< FGenericWindow >& Window, const EMouseButtons::Type Button) override;
 
 	virtual bool OnMouseDown(const TSharedPtr< FGenericWindow >& Window, const EMouseButtons::Type Button, const FVector2D CursorPos) override;
@@ -95,6 +97,8 @@ public:
 
 	virtual void HandleDPIScaleChanged(const TSharedRef< FGenericWindow >& Window) override;
 
+	virtual void SignalSystemDPIChanged(const TSharedRef< FGenericWindow >& Window) override;
+
 	virtual void OnMovedWindow(const TSharedRef< FGenericWindow >& Window, const int32 X, const int32 Y) override;
 
 	virtual bool OnWindowActivationChanged(const TSharedRef< FGenericWindow >& Window, const EWindowActivation ActivationType) override;
@@ -120,6 +124,8 @@ public:
 	virtual EDropEffect::Type OnDragDrop(const TSharedPtr< FGenericWindow >& Window) override;
 
 	virtual bool OnWindowAction(const TSharedRef< FGenericWindow >& Window, const EWindowAction::Type InActionType) override;
+
+	virtual void SetCursorPos(const FVector2D& MouseCoordinate) override;
 
 protected:
 

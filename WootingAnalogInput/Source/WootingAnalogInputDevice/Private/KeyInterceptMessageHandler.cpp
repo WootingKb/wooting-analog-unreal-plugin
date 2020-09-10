@@ -71,6 +71,13 @@ bool FKeyInterceptMessageHandler::OnKeyUp(const int32 KeyCode, const uint32 Char
 	return false;
 }
 
+void FKeyInterceptMessageHandler::OnInputLanguageChanged() {
+	if (TargetHandler.IsValid())
+	{
+		TargetHandler->OnInputLanguageChanged();
+	}
+}
+
 bool FKeyInterceptMessageHandler::OnMouseDown(const TSharedPtr< FGenericWindow >& Window, const EMouseButtons::Type Button)
 {
 	if (TargetHandler.IsValid())
@@ -362,6 +369,14 @@ void FKeyInterceptMessageHandler::HandleDPIScaleChanged(const TSharedRef< FGener
 	}
 }
 
+void FKeyInterceptMessageHandler::SignalSystemDPIChanged(const TSharedRef< FGenericWindow >& Window) {
+	if (TargetHandler.IsValid())
+	{
+		return TargetHandler->SignalSystemDPIChanged(Window);
+	}
+}
+
+
 void FKeyInterceptMessageHandler::OnMovedWindow(const TSharedRef< FGenericWindow >& Window, const int32 X, const int32 Y)
 {
 	if (TargetHandler.IsValid())
@@ -484,4 +499,11 @@ bool FKeyInterceptMessageHandler::OnWindowAction(const TSharedRef< FGenericWindo
 	}
 
 	return true;
+}
+
+void FKeyInterceptMessageHandler::SetCursorPos(const FVector2D& MouseCoordinate) {
+	if (TargetHandler.IsValid())
+	{
+		return TargetHandler->SetCursorPos(MouseCoordinate);
+	}
 }
